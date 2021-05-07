@@ -106,7 +106,11 @@ return [
     |
     */
 
-    'faker_locale' => 'en_US',
+    /**
+     * en_us is original
+     */
+    // 'faker_locale' => 'en_US',
+    'faker_locale' => 'zh_TW',
 
     /*
     |--------------------------------------------------------------------------

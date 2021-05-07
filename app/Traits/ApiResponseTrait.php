@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-trait ApiresponseTrait
+trait ApiResponseTrait
 {
     /**
      * define response way
