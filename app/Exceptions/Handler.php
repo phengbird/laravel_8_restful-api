@@ -2,11 +2,20 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpFoundation\Response;
+use App\Traits\ApiResponseTrait;
+
+
 use Throwable;
 
 class Handler extends ExceptionHandler
 {
+    use ApiResponseTrait;
+
     /**
      * A list of the exception types that are not reported.
      *
@@ -37,5 +46,39 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function render($request,Throwable $exception)
+    {
+        // dd($exception);
+        if($request->expectsJson()){
+
+            //model cant find resource
+            if($exception instanceof ModelNotFoundException){
+                return $this->errorResponse(
+                    "Can't find resource",
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            //cant find website
+            if($exception instanceof NotFoundHttpException){
+                return $this->errorResponse(
+                    "Can't find website",
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+
+            //cant find method
+            if($exception instanceof MethodNotAllowedHttpException){
+                return $this->errorResponse(
+                    $exception->getMessage(),
+                    Response::HTTP_METHOD_NOT_ALLOWED
+                );
+            }
+        }
+
+        //excute father's render 
+        return parent::render($request,$exception);
     }
 }
