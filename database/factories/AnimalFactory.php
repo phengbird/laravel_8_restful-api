@@ -30,8 +30,8 @@ class AnimalFactory extends Factory
             'birthday' => $this->faker->date(),
             'area' => $this->faker->city,
             'fix' => $this->faker->boolean,
-            'description' => $this->faker->text,
-            'personality' => $this->faker->text,
+            'description' => $this->faker->realText(), //realText can get chinese , for now
+            'personality' => $this->faker->text(),
             'user_id' => User::all()->random()->id
         ];
     }
