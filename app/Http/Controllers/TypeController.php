@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\TypeCollection;
+use App\Http\Resources\TypeResource;
 use App\Models\Type;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -13,14 +15,15 @@ class TypeController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
-     */
+    */
     public function index()
     {
         //
-        $types = Type::get();
-        return response([
-            'data' => $types,
-        ],Response::HTTP_OK);
+        // $type = Type::get();
+        // $type = Type::find('1'); //search with id=1
+        
+        $types = Type::select('id','name','sort')->get();
+        return new TypeCollection($types);
     }
 
     /**
@@ -44,36 +47,38 @@ class TypeController extends Controller
         //
         $this->validate($request , [
             'name' => [
-                'require',
+                'required' ,
                 'max:50',
-                Rule::unique('types','name')//check is unique 
+                Rule::unique('types','name') //check unique name
             ],
-            ,'sort' => 'nullable|integer'
+            'sort' => 'nullable|integer'
         ]);
 
-        if(!isset($request->sort)){
+        if(!isset($request->sort)) {
             $max = Type::max('sort');
             $request['sort'] = $max + 1;
         }
-        $type = Type::create($request->all()); //store to dbs
-        $type = $type->refresh();
+
+        $type = Type::create($request->all());
+
         return response([
-            'data' => $type,
-        ],Response::HTTP_CREATED);
+            'data' => $type
+        ] , Response::HTTP_CREATED);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Type  $type
+    * @param  \App\Models\Type  $type
      * @return \Illuminate\Http\Response
      */
     public function show(Type $type)
     {
         //
-        return response([
-            'data' => $type
-        ],Response::HTTP_OK);
+        return response()->json(['data'=>$type],Response::HTTP_OK); //this is btr way to do response json
+        // return response([
+        //     'data' => $type
+        // ] , Response::HTTP_OK);
     }
 
     /**
@@ -106,9 +111,7 @@ class TypeController extends Controller
         ]);
 
         $type->update($request->all());
-        return response([
-            'data' => $type
-        ],Response::HTTP_OK);
+        return new TypeResource($type);
 
     }
 

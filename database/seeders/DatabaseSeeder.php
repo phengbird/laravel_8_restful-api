@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Animal;
+use App\Models\Type;
 use App\models\User;
 use Illuminate\Support\Facades\Schema;
 
@@ -18,8 +19,10 @@ class DatabaseSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints(); //取消外键约束
         Animal::truncate(); //clear animal database , id start from 0
-        User::truncate(); //
+        User::truncate();
+        Type::truncate();
 
+        Type::factory(5)->create();
         User::factory(5)->create();
         Animal::factory(10000)->create();
         Schema::enableForeignKeyConstraints();

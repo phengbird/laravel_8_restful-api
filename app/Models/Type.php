@@ -13,4 +13,10 @@ class Type extends Model
         'name',
         'sort'
     ];
+
+    public function animals()
+    {
+        //hasMany(class_name,table_name,key)
+        return $this->hasMany('App\Models\Animal','type_id','id');
+    }
 }

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AnimalCollection;
+use App\Http\Resources\AnimalResource;
 use App\Models\Animal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use phpDocumentor\Reflection\Types\Nullable;
 use Symfony\Component\HttpFoundation\Response;
 
 class AnimalController extends Controller
@@ -40,7 +41,7 @@ class AnimalController extends Controller
         $limit = $request->limit ?? 10;
 
         //create search dbs , 
-        $query = Animal::query();
+        $query = Animal::query()->with('type');
 
         //filter way
         if(isset($request->filters)){
@@ -71,7 +72,8 @@ class AnimalController extends Controller
         
         //if dont have cache , then set 60sec timer , and named
         return Cache::remember($fullUrl,60,function() use ($animal){
-            return response($animal,Response::HTTP_OK);    
+            // return response($animal,Response::HTTP_OK);
+            return new AnimalCollection($animal);
         });
     }
 
@@ -95,7 +97,8 @@ class AnimalController extends Controller
     {
         //
         $this->validate($request,[
-            'type_id' => 'nullable|integer',
+            // 'type_id' => 'nullable|integer',
+            'type_id' => 'nullable|exists:types,id',
             'name' => 'required|string|max:255',
             'birthday' => 'nullable|date', //use php strtotime check date type
             'area' => 'nullable|string|max:255',
@@ -119,7 +122,8 @@ class AnimalController extends Controller
     public function show(Animal $animal)
     {
         //
-        return response($animal,Response::HTTP_OK);
+        // return response($animal,Response::HTTP_OK);
+        return new AnimalResource($animal);
     }
 
     /**
@@ -144,7 +148,7 @@ class AnimalController extends Controller
     {
         //
         $this->validate($request,[
-            'type_id' => 'nullable|integer',
+            'type_id' => 'nullable|exists:type,id',
             'name' => 'string|max:255',
             'birthday' => 'nullable|date', //use php strtotime check date type
             'area' => 'nullable|string|max:255',
