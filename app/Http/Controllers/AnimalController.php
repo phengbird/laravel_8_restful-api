@@ -145,12 +145,12 @@ class AnimalController extends Controller
         //
         $this->validate($request,[
             'type_id' => 'nullable|integer',
-            'name' => 'required|string|max:255',
+            'name' => 'string|max:255',
             'birthday' => 'nullable|date', //use php strtotime check date type
             'area' => 'nullable|string|max:255',
             'fix' => 'boolean',
-            'description' => 'nullable',
-            'personality' => 'nullable',
+            'description' => 'nullable|string',
+            'personality' => 'nullable|string',
         ]);
 
         $request['user_id'] = 1;
