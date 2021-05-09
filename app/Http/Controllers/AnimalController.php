@@ -11,6 +11,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AnimalController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('scopes:create-animals', ['only' => ['store']]);
+
+        $this->middleware('auth:api', ['except' => ['index', 'show']]);
+
+        $this->middleware('client', ['only' => ['index', 'show']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -33,7 +42,7 @@ class AnimalController extends Controller
         //combine a complete website
         $fullUrl = "{$url}?{$queryString}";
         //use laravel cache to check have record or not
-        if(Cache::has($fullUrl)){
+        if (Cache::has($fullUrl)) {
             return Cache::get($fullUrl);
         }
 
@@ -44,34 +53,35 @@ class AnimalController extends Controller
         $query = Animal::query()->with('type');
 
         //filter way
-        if(isset($request->filters)){
-            $filters = explode(',',$request->filters);
-            foreach($filters as $key => $filter){
-                list($key,$value) = explode(':',$filter);
-                $query->where($key,'like',"%$value%");
+        if (isset($request->filters)) {
+            $filters = explode(',', $request->filters);
+            foreach ($filters as $key => $filter) {
+                list($key, $value) = explode(':', $filter);
+                $query->where($key, 'like', "%$value%");
             }
         }
 
         //sort way
-        if(isset($request->sorts)){
-            $sorts = explode(',',$request->sorts);
-            foreach($sorts as $key => $sort){
-                list($key , $value) = explode(':',$sort);
-                if($value == 'asc' || $value == 'desc'){
-                    $query->orderBy($key,$value);
+        if (isset($request->sorts)) {
+            $sorts = explode(',', $request->sorts);
+            foreach ($sorts as $key => $sort) {
+                list($key, $value) = explode(':', $sort);
+                if ($value == 'asc' || $value == 'desc') {
+                    $query->orderBy($key, $value);
                 }
             }
         } else {
-            $query->orderBy('id','desc');
+            $query->orderBy('id', 'desc');
         }
 
         //show out with desc
-        $animal = $query->orderBy('id','desc')
+        $animal = $query->orderBy('id', 'desc')
             ->paginate($limit) //using page to show how many by $limit
             ->appends($request->query());
-        
+
+
         //if dont have cache , then set 60sec timer , and named
-        return Cache::remember($fullUrl,60,function() use ($animal){
+        return Cache::remember($fullUrl, 60, function () use ($animal) {
             // return response($animal,Response::HTTP_OK);
             return new AnimalCollection($animal);
         });
@@ -96,7 +106,7 @@ class AnimalController extends Controller
     public function store(Request $request)
     {
         //
-        $this->validate($request,[
+        $this->validate($request, [
             // 'type_id' => 'nullable|integer',
             'type_id' => 'nullable|exists:types,id',
             'name' => 'required|string|max:255',
@@ -107,10 +117,15 @@ class AnimalController extends Controller
             'personality' => 'nullable',
         ]);
 
-        $request['user_id'] = 1;
-        $animal = Animal::create($request->all());
+        // $request['user_id'] = 1;
+        // $animal = Animal::create($request->all());
+
+        $animal = auth()->user()->animals()->create($request->all());
+
         $animal = $animal->refresh();
-        return response($animal,Response::HTTP_CREATED);
+
+        return response($animal, Response::HTTP_CREATED);
+        // return new AnimalResource($animal);
     }
 
     /**
@@ -147,7 +162,7 @@ class AnimalController extends Controller
     public function update(Request $request, Animal $animal)
     {
         //
-        $this->validate($request,[
+        $this->validate($request, [
             'type_id' => 'nullable|exists:type,id',
             'name' => 'string|max:255',
             'birthday' => 'nullable|date', //use php strtotime check date type
@@ -157,9 +172,11 @@ class AnimalController extends Controller
             'personality' => 'nullable|string',
         ]);
 
-        $request['user_id'] = 1;
+        // $request['user_id'] = 1;
         $animal->update($request->all());
-        return response($animal,Response::HTTP_OK);
+
+        // return response($animal,Response::HTTP_OK);
+        return new AnimalResource($animal);
     }
 
     /**
@@ -172,6 +189,6 @@ class AnimalController extends Controller
     {
         //
         $animal->delete();
-        return response(null,Response::HTTP_NO_CONTENT);
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

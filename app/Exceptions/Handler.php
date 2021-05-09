@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Auth\Authenticatable\AuthenticationException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Traits\ApiResponseTrait;
-
-
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException as AuthAuthenticationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -76,9 +77,28 @@ class Handler extends ExceptionHandler
                     Response::HTTP_METHOD_NOT_ALLOWED
                 );
             }
-        }
 
+            if($exception instanceof AuthorizationException){
+                return $this->errorResponse(
+                    $exception->getMessage(),
+                    Response::HTTP_FORBIDDEN
+                );
+            }
+        }
+    
         //excute father's render 
         return parent::render($request,$exception);
+    }
+
+    protected function unauthenticated($request, AuthAuthenticationException $exception)
+    {
+        if($request->expectsJson()) {
+            return $this->errorResponse(
+                $exception->getMessage(),
+                Response::HTTP_UNAUTHORIZED
+            );
+        } else {
+            return redirect()->guest($exception->redirectTo()) ?? route('login');
+        }
     }
 }

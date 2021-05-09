@@ -19,8 +19,7 @@ class Animal extends Model
         'area',
         'fix',
         'description',
-        'personality',
-        'user_id'
+        'personality'
     ];
 
     public function type()
@@ -28,6 +27,16 @@ class Animal extends Model
         //belongTo(class_name,table_name,key)
         return $this->belongsTo('App\Models\Type');
     }
+
+    // public function animalprivate()
+    // {
+    //     $this->belongsTo('App\Models\AnimalPrivate');
+    // }
+
+    // public function user()
+    // {
+    //     $this->belongsToMany('App\Models\User','animal_user','animal_id','user_id');
+    // }   
 
     public function getAgeAttributes()
     {
