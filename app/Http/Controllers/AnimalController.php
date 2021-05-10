@@ -20,7 +20,7 @@ class AnimalController extends Controller
 
         $this->middleware('auth:api', ['except' => ['index', 'show']]);
 
-        $this->middleware('client', ['only' => ['index', 'show']]);
+        // $this->middleware('client', ['only' => ['index', 'show']]);
     }
 
     /**
@@ -109,6 +109,7 @@ class AnimalController extends Controller
     public function store(Request $request)
     {
         $this->authorize('create',Animal::class);
+    
         //
         $this->validate($request, [
             // 'type_id' => 'nullable|integer',
@@ -200,7 +201,7 @@ class AnimalController extends Controller
         $animal->update($request->all());
 
         // return response($animal,Response::HTTP_OK);
-        return new AnimalResource($animal);
+        return new AnimalResource($animal);   
     }
 
     /**

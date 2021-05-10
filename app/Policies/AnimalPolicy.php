@@ -42,6 +42,7 @@ class AnimalPolicy
     public function create(User $user)
     {
         //
+        return true;
     }
 
     /**
