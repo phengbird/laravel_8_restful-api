@@ -10,6 +10,9 @@ use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
+    const ADMIN_USER = 'admin';
+    const MEMBER_USER = 'member';
+    
     use HasFactory, Notifiable;
     use HasApiTokens;
 
@@ -46,5 +49,18 @@ class User extends Authenticatable
     public function animals()
     {
         return $this->hasMany('App\Models\Animal','user_id','id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->permission === User::ADMIN_USER;
+    }
+
+    /**
+     *  many to many relation animal and user likes
+     */
+    public function likes()
+    {
+        return $this->belongsToMany('App\Models\Animal','animal_user_likes')->withTimestamps();
     }
 }

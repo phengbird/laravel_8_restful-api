@@ -28,16 +28,24 @@ class Animal extends Model
         return $this->belongsTo('App\Models\Type');
     }
 
-    // public function animalprivate()
-    // {
-    //     $this->belongsTo('App\Models\AnimalPrivate');
-    // }
+    public function animalprivate()
+    {
+        $this->belongsTo('App\Models\AnimalPrivate');
+    }
 
-    // public function user()
-    // {
-    //     $this->belongsToMany('App\Models\User','animal_user','animal_id','user_id');
-    // }   
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User');
+    }  
 
+    /**
+     *  many to many relation animal and user likes
+     */
+    public function likes()
+    {
+        return $this->belongsToMany('App\Models\User','animal_user_likes')->withTimestamps();
+    }
+    
     public function getAgeAttributes()
     {
         $diff = Carbon::now()->diff($this->birthday);

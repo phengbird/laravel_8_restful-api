@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Resources\AnimalCollection;
 use App\Http\Resources\AnimalResource;
 use App\Models\Animal;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AnimalController extends Controller
 {
@@ -105,6 +108,7 @@ class AnimalController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create',Animal::class);
         //
         $this->validate($request, [
             // 'type_id' => 'nullable|integer',
@@ -120,12 +124,31 @@ class AnimalController extends Controller
         // $request['user_id'] = 1;
         // $animal = Animal::create($request->all());
 
-        $animal = auth()->user()->animals()->create($request->all());
+        try{
+            //start dbs
+            DB::beginTransaction();
 
-        $animal = $animal->refresh();
+            $animal = auth()->user()->animals()->create($request->all());
 
-        return response($animal, Response::HTTP_CREATED);
-        // return new AnimalResource($animal);
+            $animal = $animal->refresh();
+
+            //auto sign-in likes table
+            $animal->likes()->attach(auth()->user()->id);
+
+            //excute dbs comment
+            DB::commit();
+
+            return new AnimalResource($animal);
+
+        } catch(\Exception $e) {
+            DB::rollBack();
+
+            //record error log
+            $errorMessage = 'MESSAGE: ' . $e.getMessage();
+            Log::error($errorMessage);
+
+            return response()->json(['error' => 'Process error'],Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -161,6 +184,7 @@ class AnimalController extends Controller
      */
     public function update(Request $request, Animal $animal)
     {
+        $this->authorize('update',$animal);
         //
         $this->validate($request, [
             'type_id' => 'nullable|exists:type,id',
