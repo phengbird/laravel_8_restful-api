@@ -43,9 +43,9 @@ class AnimalTest extends TestCase
         User::factory(5)->create();
         Animal::factory(10)->create();
 
-        $response = $this->json('get','api/animals');
+        $response = $this->json('get','api/v1/animals');
         //setting when catch exception warn it
-        $this->withExceptionHandling();
+        $this->withoutExceptionHandling();
 
         $resultStructure = [
             'data' => [ 
@@ -95,7 +95,7 @@ class AnimalTest extends TestCase
 
         $response = $this->json(
             'POST',
-            'api/animals',
+            'api/v1/animals',
             $formData
         );
 
@@ -112,7 +112,7 @@ class AnimalTest extends TestCase
         // 做什麼事? 請求時並傳入資料
         $response = $this->json(
             'POST',
-            'api/animals',
+            'api/v1/animals',
             [
                 'type_id' => $type->id,
                 'name' => '大黑',

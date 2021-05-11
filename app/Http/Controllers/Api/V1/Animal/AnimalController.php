@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1\Animal;
 
+use App\http\Controllers\Controller;
 use App\Http\Resources\AnimalCollection;
 use App\Http\Resources\AnimalResource;
 use App\Models\Animal;

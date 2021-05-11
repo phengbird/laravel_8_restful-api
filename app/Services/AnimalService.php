@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Animal;
+
 class AnimalService
 {
     protected function filterAnimals($query , $filters)
@@ -44,8 +46,8 @@ class AnimalService
         //create search dbs , 
         $query = Animal::query()->with('type');
 
-        $query = $this->animalServices->filterAnimals($query , $request->filters);
-        $query = $this->animalServices->sort($query , $request->sorts);
+        $query = $this->filterAnimals($query , $request->filters);
+        $query = $this->sort($query , $request->sorts);
 
         //show out with desc
         $animal = $query->orderBy('id', 'desc')
