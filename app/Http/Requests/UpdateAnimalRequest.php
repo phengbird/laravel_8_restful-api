@@ -5,8 +5,8 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 /**
  * @OA\Schema(
- *     schema="StoreAnimalRequest",
- *     required={"name","fix"},
+ *     schema="UpdateAnimalRequest",
+ *     required={},
  *     @OA\Property(
  *         property="type_id",
  *         type="integer",
@@ -50,7 +50,7 @@ use Illuminate\Foundation\Http\FormRequest;
  *     )
  * )
  */
-class StoreAnimalRequest extends FormRequest
+class UpdateAnimalRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -71,13 +71,13 @@ class StoreAnimalRequest extends FormRequest
     {
         return [
             //
-            'type_id' => 'nullable|exists:types,id',
-            'name' => 'required|string|max:255',
-            'birthday' => 'nullable|date',
+            'type_id' => 'nullable|exists:type,id',
+            'name' => 'string|max:255',
+            'birthday' => 'nullable|date', //use php strtotime check date type
             'area' => 'nullable|string|max:255',
-            'fix' => 'required|boolean',
-            'description' => 'nullable',
-            'personality' => 'nullable'
+            'fix' => 'boolean',
+            'description' => 'nullable|string',
+            'personality' => 'nullable|string',
         ];
     }
 }
