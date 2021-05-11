@@ -81,7 +81,7 @@ class AnimalTest extends TestCase
             $user,['create-animals']//setting user has a scope with create-animals
         );
 
-        $this->withExceptionHandling();
+        $this->withoutExceptionHandling();
 
         $type = Type::factory()->create();
 
