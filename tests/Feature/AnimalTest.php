@@ -51,7 +51,7 @@ class AnimalTest extends TestCase
             'data' => [ 
                 //too much data , use * to check all in table 
                 '*' => [
-                    "id" , "type_id" , "type_name" , "name" , "birthday" , "age" , "area" , "fix" , "description" , "personality" , "created_at"
+                    "id" , "type_id" , "type_name" , "name" , "birthday" , "age" , "area" , "fix" , "description" , "personality" , "created_at" , "update_at" 
                  ]
             ],
 
